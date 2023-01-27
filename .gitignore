@@ -1,0 +1,11 @@
+venv
+data
+.ipynb_checkpoints
+.pre-commit-config.yaml
+.vscode/settings.json
+__pycache__
+*.pyc
+materials
+.idea
+.virtual_documents
+*.png
