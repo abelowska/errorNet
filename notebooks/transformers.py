@@ -73,16 +73,20 @@ class PickChannels(TransformerMixin, BaseEstimator):
 
 
 class BandpassFilter(TransformerMixin, BaseEstimator):
+    def __init__(self, h_freq=30.0, l_freq=None):
+        self.h_freq = h_freq
+        self.l_freq = l_freq
+        
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
-        iir_params = dict(order=6, ftype="butter")
+        iir_params = dict(order=2, ftype="butter")
 
         X["epoch"] = X["epoch"].map(
             lambda x: x.filter(
-                l_freq=None,
-                h_freq=40.0,
+                l_freq=self.l_freq,
+                h_freq=self.h_freq,
                 method="iir",
                 iir_params=iir_params,
                 n_jobs=10,
@@ -755,8 +759,8 @@ class EpochTrim(TransformerMixin, BaseEstimator):
             lambda x: x.crop(tmin=self.tmin, tmax=self.tmax)
         )
 
-        data_shape = X["epoch"][0].get_data().shape
-        print(f"IN PE RETURN SHAPE: {data_shape}")
+        # data_shape = X["epoch"][0].get_data().shape
+        # print(f"IN PE RETURN SHAPE: {data_shape}")
         return X
 
 class PeTransformer2(TransformerMixin, BaseEstimator):
