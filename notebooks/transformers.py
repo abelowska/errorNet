@@ -126,11 +126,14 @@ class ExtractData(TransformerMixin, BaseEstimator):
 
 # return np array of epochs per participant SHAPE: participants x channels x timepoints
 class ExtractDataEpochs(TransformerMixin, BaseEstimator):
+    def __init__(self, condition="error_response"):
+        self.condition=condition
+        
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
-        data = np.array(X["epoch"].map(lambda x: x["error_response"]._data).to_list())
+        data = np.array(X["epoch"].map(lambda x: x[self.condition]._data).to_list())
         return data
 
 

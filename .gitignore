@@ -1,5 +1,9 @@
 venv
 data
+images
+public_data
+notebooks/old/
+
 .ipynb_checkpoints
 .pre-commit-config.yaml
 .vscode/settings.json
