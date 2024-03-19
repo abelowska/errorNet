@@ -13,3 +13,4 @@ materials
 .idea
 .virtual_documents
 *.png
+get-pip.py

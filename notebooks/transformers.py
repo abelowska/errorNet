@@ -8,6 +8,7 @@ from scipy.signal import butter, lfilter
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
+from scipy.integrate import simpson
 
 
 signal_frequency = 256
@@ -836,12 +837,50 @@ class AverageSignal(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X):
-        # print(f"IN AVERAGE X SHAPE: {X.shape}")
         averaged_signal = np.array([np.mean(participant, axis=-1) for participant in X])
-        # print(f"IN AVERAGE RETURN SHAPE: {averaged_paricipant_epochs.shape}")
-        # print(averaged_paricipant_epochs.dtype)
         return averaged_signal
 
+class FractionalAreaLatency(TransformerMixin, BaseEstimator):
+    def __init__(self, fraction = 0.5, tmin = 0.0, tmax = 0.5, threshold = 0.0):
+        self.fraction=fraction,
+        self.tmin=tmin,
+        self.tmax=tmax,
+        self.threshold=threshold
+
+    def fractional_negative_area_latency(self, signal):
+        x = np.linspace(self.tmin[0], self.tmax[0], num=signal.shape[-1])
+        y = signal.flatten()
+        
+        # get only negative part of signal
+        y_negative = [abs(y_item) if y_item < self.threshold else 0 for y_item in y]
+        
+        # calculate area under the signal
+        area = abs(simpson(y_negative, x))
+        
+        if area != 0.0:
+            fractional_area = area * self.fraction[0]
+        
+            # search for latency point (x) which split area according to fraction provided 
+            current_area = 0
+            fractional_area_index = 0
+            i = 2
+            while abs(simpson(y_negative[:i], x[:i])) <= fractional_area:
+                current_area = abs(simpson(y_negative[:i], x[:i]))
+                fractional_area_index = i
+                i+=1
+            return (fractional_area_index, x[fractional_area_index])    
+        else:
+            print('No area detected')
+            return (np.nan, np.nan) 
+         
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X=X[0]
+        fractional_area_latencies = np.array([self.fractional_negative_area_latency(this_signal)[1] for this_signal in X])
+        return fractional_area_latencies
+    
 
 class ErnMinMaxFeatures(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None):
