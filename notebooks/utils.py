@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import networkx as nx
 import scipy as sp
+import os
 
 from collections import defaultdict
 
@@ -100,11 +101,14 @@ def draw_graph(
     basic=False, 
     mapping=None, 
     seed=1, 
-    nodes_predictabilities=None, 
+    nodes_predictabilities=None,
+    node_colors = None,
     scale=1, 
     specific_positions = [], 
-    layout = None, 
-    save=None
+    layout = None,
+    nx_layout=None,
+    save=None,
+    dir=None,
 ):
     """
     Draws graph based on the provided links DataFrame
@@ -168,23 +172,23 @@ def draw_graph(
     G = nx.relabel_nodes(G, mapping) if mapping is not None else G
     
     # set nodes colors
-    node_color=[palette[0] if node.find('Q') != -1 
-                else palette[1]if node.find('E') != -1 
-                else palette[2] for node in G.nodes()]
+    node_color = [node_colors[node] if node in node_colors else palette[0] for node in G.nodes()]
     # set nodes position
     edges = G.edges() 
     
     for u,v in edges:
         G[u][v]['weight'] = abs(G[u][v]['weight'])
     
-    if layout == None:
-        pos_i = nx.spring_layout(G, k=0.1*(1/np.sqrt(len(G.nodes()))), iterations=1000, scale=scale, seed=seed)
+    if (layout == None) & (nx_layout == None):
+        pos_i = nx.spring_layout(G, k=60*(1/np.sqrt(len(G.nodes()))), iterations=1000, scale=scale, seed=seed)
         pos = pos_i
         # set specific positions, if desired
         for position in specific_positions:
             pos[position[0]] = position[1]
-    else:
+    elif (layout != None) & (nx_layout == None):
         pos = layout
+    else:
+        pos = nx_layout(G, scale=scale)
 
     # if basic is False, draw all links
     if basic is False:
@@ -301,14 +305,14 @@ def draw_graph(
         pos=pos,
         linewidths=0.5,
         edgecolors='black',
-        node_size = 190,
+        node_size = 205,
         node_color=node_color,
     )
 
     nx.draw_networkx_labels(
         G, 
         pos=pos,
-        font_size=7,
+        font_size=6,
     )
     
     if basic == False:
@@ -363,12 +367,12 @@ def draw_graph(
             node_predictability_percent = 360 * node_predictability
             cor_x, cor_y = item[1]
 
-            weg_bck = Wedge((cor_x, cor_y), .060, 0, 360, width=0.03, edgecolor='black', linewidth=0.3, facecolor='white')
+            weg_bck = Wedge((cor_x, cor_y), .065, 0, 360, width=0.03, edgecolor='black', linewidth=0.3, facecolor='white')
             patches.append(weg_bck)
             colors.append(0)
             ax.add_patch(weg_bck)
 
-            weg = Wedge((cor_x, cor_y), .060, 0, node_predictability_percent, width=0.03, edgecolor='black', linewidth=0.3, facecolor='gray')
+            weg = Wedge((cor_x, cor_y), .065, 0, node_predictability_percent, width=0.03, edgecolor='black', linewidth=0.3, facecolor='gray')
             patches.append(weg)
             colors.append(1)
             ax.add_patch(weg)
@@ -376,7 +380,7 @@ def draw_graph(
     plt.show()
 
     if save != None:
-        fig.savefig(f'../images/{save}.png', bbox_inches='tight')
+        fig.savefig(os.path.join(dir, f'{save}.png'), bbox_inches='tight')
 
     return pos, G
 
@@ -567,7 +571,10 @@ def draw_difference_graph(
     k=1, 
     specific_positions=[], 
     layout = None, 
-    save = None
+    save = None,
+    node_colors = None,
+    nx_layout=None,
+    dir=None,
 ):
     """
     Draws graph based on the provided links DataFrame
@@ -625,11 +632,16 @@ def draw_difference_graph(
     for u,v in edges:
         G_copy[u][v]['weight'] = abs(G_copy[u][v]['weight'])
     
-    if layout is None:
-        pos_i = nx.spring_layout(G_copy, k=0.1*(1/np.sqrt(len(G.nodes()))), iterations=1000, scale=scale, seed=seed)
-        pos=pos_i
-    else:
+    if (layout == None) & (nx_layout == None):
+        pos_i = nx.spring_layout(G, k=60*(1/np.sqrt(len(G.nodes()))), iterations=1000, scale=scale, seed=seed)
+        pos = pos_i
+        # set specific positions, if desired
+        for position in specific_positions:
+            pos[position[0]] = position[1]
+    elif (layout != None) & (nx_layout == None):
         pos = layout
+    else:
+        pos = nx_layout(G, scale=scale)
 
     ####################################################################################33
     
@@ -651,9 +663,7 @@ def draw_difference_graph(
         G_copy[u][v]['weight'] = abs(G_copy[u][v]['weight'])
     
     # set nodes colors
-    node_color=[palette[0] if node.find('Q') != -1 
-                else palette[1]if node.find('E') != -1 
-                else palette[2] for node in G.nodes()]
+    node_color = [node_colors[node] if node in node_colors else palette[0] for node in G.nodes()]
             
     edges = G.edges()
     
@@ -703,7 +713,7 @@ def draw_difference_graph(
     nx.draw_networkx_labels(
         G, 
         pos=pos,
-        font_size=7,
+        font_size=6,
     )
     
     nx.draw_networkx_edges(
@@ -720,4 +730,4 @@ def draw_difference_graph(
     plt.show() 
     
     if save != None:
-        fig.savefig(f'../images/{save}.png',  bbox_inches='tight')
+        fig.savefig(os.path.join(dir, f'{save}.png'), bbox_inches='tight')
