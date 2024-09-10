@@ -1,8 +1,7 @@
 venv
-data
-images
-public_data
-notebooks/old/
+**/old/
+**/*results*/
+**/*data*/
 
 .ipynb_checkpoints
 .pre-commit-config.yaml

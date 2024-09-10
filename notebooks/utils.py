@@ -39,7 +39,7 @@ def get_links(precision_matrix_df, threshold=0.02):
     links : pd.DataFrame
         A DataFrame that consists of 3 columns: var1, var2, and weight.
     """
-    precision_matrix_df = precision_matrix_df.where(np.triu(np.ones(precision_matrix_df.shape)).astype(np.bool))
+    precision_matrix_df = precision_matrix_df.where(np.triu(np.ones(precision_matrix_df.shape)).astype(bool))
 
     links = precision_matrix_df.stack().reset_index()
     links.columns = ['var1', 'var2','weight']
@@ -411,8 +411,10 @@ def calculate_nodes_predictability(
     
     precision_matrix_df_mask = precision_matrix_df.mask(abs(precision_matrix_df) <= threshold, False)
     precision_matrix_df_mask = precision_matrix_df_mask.mask(abs(precision_matrix_df_mask) > threshold, True)
-    
-    np.fill_diagonal(precision_matrix_df_mask.values, False)
+
+    # Set the diagonal elements to False
+    for i in range(len(precision_matrix_df_mask)):
+        precision_matrix_df_mask.iat[i, i] = False  
 
     explained_variance = []
 
