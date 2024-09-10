@@ -1,2 +1,8 @@
-# error Net
-Project for examining network structure of anxiety dimensions and error-related brain activity.
+# errorNet
+The project aims to explain associations between biomarkers of response-related brain activity (ERN, CRN ERP components) and self-report measures related to anxiety, depression, obsessive thoughts, compulsive behavior, and motivation. The project relies on Gaussian Graphical modeling with stability selection procedure.
+
+## Abstract
+
+Error monitoring, which plays a crucial role in shaping adaptive behavior, is influenced by a complex interplay of affective and motivational factors. Understanding these associations often proves challenging due to the intricate nature of these variables. With the aim of addressing previous inconsistencies and methodological gaps, in this study we utilized network analysis to investigate the relationship between affective and motivational individual differences and error monitoring. We employed six Gaussian Graphical Models on a non-clinical population (N=236) to examine the conditional dependence between the amplitude of response-related potentials (error-related negativity, ERN; correct-related negativity, CRN) and 29 self-report measures related to anxiety, depression, obsessive thoughts, compulsive behavior, and motivation, while adjusting for covariates: age, handedness, and latency of ERN and CRN. We then validated our results on an independent sample of 107 participants. Our findings revealed unique associations between ERN amplitudes and specific traits. Notably, more pronounced ERN amplitudes were associated with increased rumination and obsessing, and decreased reward sensitivity. Importantly, in our non-clinical sample, ERN was not directly associated with trait anxiety. These results underscore the nuanced effects of affective and motivational traits on error processing in healthy population.
+
+This project is part of the Error Monitoring Project, which aims to clarify the relationship and dynamics between error processing, individual differences and symptoms of psychopathology.
